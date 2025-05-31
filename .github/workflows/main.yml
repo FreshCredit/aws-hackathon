@@ -1,0 +1,58 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Type check
+      run: npx tsc --noEmit
+    
+    - name: Lint
+      run: npm run lint
+    
+    - name: Build
+      run: npm run build
+      env:
+        # Add dummy values for build process
+        NEXT_PUBLIC_APP_NAME: freshcredit
+        AUTH0_SECRET: dummy-secret
+        AUTH0_BASE_URL: http://localhost:3000
+        AUTH0_ISSUER_BASE_URL: https://dummy.auth0.com
+        AUTH0_CLIENT_ID: dummy-client-id
+        AUTH0_CLIENT_SECRET: dummy-client-secret
+        TURSO_DB_URL: dummy-url
+        TURSO_DB_AUTH_TOKEN: dummy-token
+        PLAID_CLIENT_ID: dummy-plaid-id
+        PLAID_SECRET: dummy-plaid-secret
+        PLAID_ENV: sandbox
+        AWS_ACCESS_KEY_ID: dummy-aws-key
+        AWS_SECRET_ACCESS_KEY: dummy-aws-secret
+        AWS_REGION: us-east-1
+        ANTHROPIC_API_KEY: dummy-anthropic-key
+
+  # Add deployment job if needed
+  # deploy:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   if: github.ref == 'refs/heads/main'
+  #   steps:
+  #     - name: Deploy to production
+  #       # Add deployment steps here 
